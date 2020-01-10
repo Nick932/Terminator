@@ -1,4 +1,5 @@
 '''''''''
+
 In this scrpit you can choose directory for seeking and
 the lowest avalible size. Files with lower size will be deleted.
 

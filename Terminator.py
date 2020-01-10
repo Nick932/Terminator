@@ -1,61 +1,62 @@
 '''''''''
-In this scrpit you can choose directories for seeking and
-necessary size of files to delete them.
+
+In this scrpit you can choose directory for seeking and
+the lowest avalible size. Files with lower size will be deleted.
+
+You can use it by shell: "python3 Terminator.py tree_path minimal_size"
 
 Created by Nickel.
 
 '''''''''
 
 
-import os
-import traceback
-
-amount=68 # how much directories would you like to research?
-
-dirs_names=[str(x) for x in range(amount)] 
+import os,  sys
 
 
+def asking(lis):
+    print('Next files was founded:')
+    for each in lis:
+        print('\n'+str(each))
+    while True:
+        answer = input('Would you like to terminate this files? Input "Y" for yes, and "N" for "no"-answer.')
+        if answer == 'Y':
+            return True
+        if answer == 'N':
+            return False
+        else:
+            print ('Incorrect answer. Please, try again.')
 
-
-pa='/media/user/USB DISK/recup_dir.2' # put here one of paths
-paths=[]                                # put here list of them, or...
-
-#____________________________________________________________________________#
-# ... because names of directories have difference in only last one digital, 
-# I generate all directory's paths using this way:
-
-count=2 # I started with '2' because my first directory (pa) ends with 2.
-while len(paths)<amount: 
-    x=pa[:-1]
-    x=x+str(count)
-    count+=1
-    paths.append(x)
-
-minimal_size=118000 # in bytes. EACH SMALLER FILE WILL BE DELETED!
-#____________________________________________________________________________#
-
-
-#######################TERMINATION PROCESS#####################################
-
-for each in paths:
+def terminator(tree, minimal_size):
+    termination_list = []
+    for (thisdir,  subdirs,  fileshere) in os.walk(tree):
+        for each in fileshere:
+            if str(each)!= 'Terminator.py':
+                # Lets see size of file...
+                fullFilePath = str(thisdir)+str(os.sep)+str(each)
+                stats = os.stat(fullFilePath)
+                if stats.st_size<minimal_size:
+                    termination_list.append(fullFilePath)
+    if asking(termination_list) == True:
+        try:
+            os.remove(fullFilePath)
+        except Exception:
+            print('WARNING!\nSome unknown error was occured:',  sys.exc_info())
+        except PermissionError:  
+            print('WARNING!\nTermination of file', fullFilePath, 'is not permitted. File skipped.')
+        else:
+            print('File', str(each), 'from directory', thisdir,   'was terminated.')
+        print('Termination process completed.')
+    else:
+        print('Termination process aborted.')
+                    
+if __name__ == '__main__':
+    print('Terminator is a process, which looking for files with size\nbellow than pointed (aka "minimal_size"). Terminator will delete such files\n immediately. Be careful while using.\n Correct format of calling this file form shell: \npython3 Terminator.py <name_of_root_to_process> <minimal_size>\nRoot directory must contains full path.\n Minimal size pointed in bytes.')
     try:
-        files=os.listdir(each)
-    
-        for file in files:
-            if file!='terminator.py':
-                statinfo = os.stat(str(each)+'/'+str(file))
-                if statinfo.st_size<minimal_size:
-                    os.remove(str(each)+'/'+str(file))
-                    print('"'+file+'"', 'TERMINATED from directory:',
-                          '\n',each, '\n')
-    except FileNotFoundError:
-        print('______________________________' '\n', '\n', 
-        "some directories which was add to paths dosn't exist:")
-        doesnt=(str(traceback.format_exc().rstrip()))
-        doesnt=doesnt.split('directory:')
-        exces=doesnt[1]
-        print(exces, '\n', '______________________________', '\n')
-
-print('Termination status: complete.')   
-    
+        terminator(sys.argv[1],  sys.argv[2])
+    except Exception:
+        print('''Unexpected error. Use "python3 Terminator.py 
+<name_of_root_directory_to_process> <minimal_size>" format of command.
+Root directory must contains
+ full path.\n Minimal size must be pointed in bytes.''')
+        sys.exit()    
     

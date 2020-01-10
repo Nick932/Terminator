@@ -2,7 +2,7 @@
 In this scrpit you can choose directories for seeking and
 necessary size of files to delete them.
 
-Created by Kur1st.
+Created by Nickel.
 
 '''''''''
 

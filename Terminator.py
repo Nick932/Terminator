@@ -1,5 +1,4 @@
 '''''''''
-
 In this scrpit you can choose directory for seeking and
 the lowest avalible size. Files with lower size will be deleted.
 
@@ -18,7 +17,7 @@ def asking(lis):
     for each in lis:
         print('\n'+str(each))
     while True:
-        answer = input('Would you like to terminate this files? Input "Y" for yes, and "N" for "no"-answer.')
+        answer = input('Would you like to terminate this files? \nInput "Y" for yes, and "N" for "no"-answer.')
         if answer == 'Y':
             return True
         if answer == 'N':
@@ -38,7 +37,8 @@ def terminator(tree, minimal_size):
                     termination_list.append(fullFilePath)
     if asking(termination_list) == True:
         try:
-            os.remove(fullFilePath)
+            for each in termination_list:
+                os.remove(each)
         except Exception:
             print('WARNING!\nSome unknown error was occured:',  sys.exc_info())
         except PermissionError:  
@@ -54,9 +54,8 @@ if __name__ == '__main__':
     try:
         terminator(sys.argv[1],  sys.argv[2])
     except Exception:
-        print('''Unexpected error. Use "python3 Terminator.py 
+        print('Unexpected error:',  sys.exc_info(),  '''. \nUse "python3 Terminator.py 
 <name_of_root_directory_to_process> <minimal_size>" format of command.
 Root directory must contains
  full path.\n Minimal size must be pointed in bytes.''')
         sys.exit()    
-    

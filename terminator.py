@@ -44,7 +44,7 @@ def is_deletion_confirmed(list_of_file_names: List[str]):
     for filename in list_of_file_names:
         print('\n'+filename)
     while True:
-        answer = input('Would you like to terminate these files? \n[Y]es or [N]o.')
+        answer = input('Would you like to terminate these files? \n[Y]es or [N]o.\n')
         if answer in ['Y', 'y']:
             return True
         if answer in ['N', 'n']:
@@ -84,6 +84,7 @@ def is_meets_criteria(
 
     :rtype: bool
     """
+    result = False
 
     if criteria not in AvailableCriteria._member_map_.values():
         raise ValueError(
@@ -96,18 +97,20 @@ def is_meets_criteria(
 
     if criteria == AvailableCriteria.size.value:
         file_size = os.stat(path_to_file).st_size
-        return is_value_meets_required(
+        result = is_value_meets_required(
             current_value=int(file_size),
             required_value=int(criteria_value),
             comparing_type=comparing_type,
         )
     elif criteria == AvailableCriteria.extension.value:
-        file_extension = Path(path_to_file).suffix
-        return is_value_meets_required(
+        file_extension = Path(path_to_file).suffix[1:]
+        result = is_value_meets_required(
             current_value=str(file_extension),
             required_value=criteria_value,
             comparing_type=comparing_type,
         )
+
+    return result
 
 
 def terminator(root_directory_path: str, criteria, criteria_value, comparing_type):
@@ -137,7 +140,7 @@ def terminator(root_directory_path: str, criteria, criteria_value, comparing_typ
                 if file_name[:4].upper() == 'SARA':
                     print('\n[ఠ‗ఠ] ︻デ═一\n- Sara Connor?\n')
                 if is_meets_criteria(full_path_to_file, criteria, criteria_value, comparing_type):
-                    termination_list.append(full_path_to_file)
+                    termination_list.append(str(full_path_to_file))
 
     if not termination_list:
         print('Files matching the criteria were not found. Aborting.')
@@ -153,11 +156,11 @@ def terminator(root_directory_path: str, criteria, criteria_value, comparing_typ
             except PermissionError:
                 print(f'WARNING!\nTermination of file {full_path_to_file} is not permitted. File skipped.')
             else:
-                print(f'File {full_path_to_file} was terminated.')
-        print('Termination process completed.')
+                print(f'File {full_path_to_file} was terminated.\n')
+        print('\nTermination process completed.')
 
     else:
-        print('Termination process aborted.')
+        print('\nFiles were not deleted. Termination process aborted.')
 
 
 this_file_name_string = os.path.basename(__file__)
@@ -219,7 +222,6 @@ if __name__ == '__main__':
     if the_path[-1] == "/":
         the_path = the_path[:-1]
 
-    # TODO: добавить loglevel точки логгирования
     terminator(
         criteria=sys.argv[1],
         criteria_value=sys.argv[2],

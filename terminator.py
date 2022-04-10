@@ -1,13 +1,10 @@
 """
-In this script you can choose directory for seeking and
-the lowest available size. Files with lower size will be deleted.
+Terminator is a script, which is looking for files meets
+the pointed criteria. Terminator will find and show
+such files to you. If you agree, the script will delete them.
 
-You can use it by shell: "python3 terminator.py <tree_path> <minimal_size in bytes>"
-
-Created by Nick Kanah.
-
+Copyleft 2020 Nick Kanah. Knowledge must be free.
 """
-# TODO: актуализировать ^ и README !
 
 import os
 import sys
@@ -39,8 +36,9 @@ list_of_comparing_types = [comparing_type.value for comparing_type in ComparingT
 
 
 def is_deletion_confirmed(list_of_file_names: List[str]):
-    # TODO docs
-    print('Next files matching the criteria were found:')
+    """Asks the user if he wants to delete the found files."""
+    print('\nNext files matching the criteria were found:')
+    list_of_file_names.sort()
     for filename in list_of_file_names:
         print('\n'+filename)
     while True:
@@ -136,9 +134,6 @@ def terminator(root_directory_path: str, criteria, criteria_value, comparing_typ
         for file_name in files_here:
             if file_name != 'terminator.py':
                 full_path_to_file = Path(this_dir) / file_name
-                file_name = Path(full_path_to_file).name
-                if file_name[:4].upper() == 'SARA':
-                    print('\n[ఠ‗ఠ] ︻デ═一\n- Sara Connor?\n')
                 if is_meets_criteria(full_path_to_file, criteria, criteria_value, comparing_type):
                     termination_list.append(str(full_path_to_file))
 
@@ -149,14 +144,22 @@ def terminator(root_directory_path: str, criteria, criteria_value, comparing_typ
     if is_deletion_confirmed(termination_list):
 
         for full_path_to_file in termination_list:
+
             try:
                 os.remove(full_path_to_file)
             except Exception:
                 print('ERROR!\nSome unknown error was occured:\n',  sys.exc_info())
             except PermissionError:
                 print(f'WARNING!\nTermination of file {full_path_to_file} is not permitted. File skipped.')
+
             else:
+
+                file_name = Path(full_path_to_file).name
+                if file_name[:4].upper() == 'SARA':
+                    print('\n|ఠ‗ఠ| ︻デ═一\n- Sara Connor?')
+
                 print(f'File {full_path_to_file} was terminated.\n')
+
         print('\nTermination process completed.')
 
     else:
@@ -174,10 +177,11 @@ def docs():
     print(
         '\nTerminator is a script, which is looking for files meets\n'
         'the pointed criteria. Terminator will find and show\n'
-        'such files to you. If you will agree, the script will delete them.\n'
+        'such files to you. If you agree, the script will delete them.\n'
         '\nBe careful while using.\n\n'
         'Correct format of calling this script using shell:\n'
-        f'python3 {this_file_name_string} <{criteria_string}> <{value_string}> <{comparing_type_string}> <{root_directory_to_process_string}>\n\n'
+        f'python3 {this_file_name_string} <{criteria_string}> <{value_string}> <{comparing_type_string}> '
+        f'<{root_directory_to_process_string}>\n\n'
         f'· {criteria_string} - the attribute of file which we are using to decide if it will be deleted or not.\n'
         '  Available criteria for now:'
     )
@@ -198,9 +202,6 @@ def docs():
 
 
 if __name__ == '__main__':
-
-    ################################################ DOCS ###############################################
-    ####################################################################################################
 
     if len(sys.argv) < 4:
 
